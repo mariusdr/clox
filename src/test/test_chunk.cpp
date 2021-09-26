@@ -18,9 +18,9 @@ TEST(TestChunk, FreeChunk)
     Chunk xs; 
     initChunk(&xs);
 
-    writeChunk(&xs, 123);
-    writeChunk(&xs, 123);
-    writeChunk(&xs, 123);
+    writeChunk(&xs, 123, 0);
+    writeChunk(&xs, 123, 0);
+    writeChunk(&xs, 123, 0);
     
     freeChunk(&xs);
     EXPECT_EQ(xs.count, 0);
@@ -33,7 +33,7 @@ TEST(TestChunk, WriteSingle)
     Chunk xs;
     initChunk(&xs);
 
-    writeChunk(&xs, 123);
+    writeChunk(&xs, 123, 0);
     EXPECT_EQ(xs.count, 1);
     EXPECT_EQ(xs.code[0], 123);
 
@@ -47,7 +47,7 @@ TEST(Testchunk, WriteSequence)
     size_t n = 23456;
     for (int i = 0; i < n; ++i) 
     {
-        writeChunk(&xs, uint8_t{i % 255});
+        writeChunk(&xs, uint8_t{i % 255}, 0);
     }
     EXPECT_EQ(xs.count, n);
     for (int i = 0; i < n; ++i) 
