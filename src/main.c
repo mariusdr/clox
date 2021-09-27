@@ -2,27 +2,37 @@
 
 #include "chunk.h"
 #include "debug.h"
+#include "vm.h"
 
 int main(int argc, char** argv) 
 {
+    initVM();
+
     Chunk chunk;
     initChunk(&chunk);
-    writeChunk(&chunk, OP_RETURN, 0);
 
     int constant = addConstant(&chunk, 1.2);
     writeChunk(&chunk, OP_CONSTANT, 1);
     writeChunk(&chunk, constant, 2);
-
-    constant = addConstant(&chunk, 1.337);
-    writeChunk(&chunk, OP_CONSTANT, 3);
-    writeChunk(&chunk, constant, 4);
     
-    constant = addConstant(&chunk, -0.0042);
-    writeChunk(&chunk, OP_CONSTANT, 5);
-    writeChunk(&chunk, constant, 6);
+    constant = addConstant(&chunk, 3.4);
+    writeChunk(&chunk, OP_CONSTANT, 1);
+    writeChunk(&chunk, constant, 2);
 
-    disassembleChunk(&chunk, "main");
+    writeChunk(&chunk, OP_ADD, 1);
+
+    constant = addConstant(&chunk, 5.6);
+    writeChunk(&chunk, OP_CONSTANT, 1);
+    writeChunk(&chunk, constant, 2);
+
+    writeChunk(&chunk, OP_DIVIDE, 2);
+
+    writeChunk(&chunk, OP_RETURN, 2);
+
+    //disassembleChunk(&chunk, "main");
+    interpret(&chunk);
+
+    freeVM();
     freeChunk(&chunk);
-
     return EXIT_SUCCESS;
 }
