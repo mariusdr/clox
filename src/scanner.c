@@ -51,6 +51,7 @@ static bool match(char expected) {
   if (*scanner.current != expected) {
     return false;
   }
+  scanner.current++;
   return true;
 }
 
@@ -232,7 +233,6 @@ Token scanToken() {
     return makeToken(TOKEN_SLASH);
   case '*':
     return makeToken(TOKEN_STAR);
-
   case '!':
     return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
   case '=':
