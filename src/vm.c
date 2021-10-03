@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
 #include "vm.h"
+#include "object.h"
+#include "memory.h"
 
 VM vm;
 
@@ -23,9 +26,14 @@ static void runtimeError(const char* format, ...) {
   resetStack();
 }
 
-void initVM() { resetStack(); }
+void initVM() { 
+  resetStack(); 
+  vm.objects = NULL;
+}
 
-void freeVM() {}
+void freeVM() {
+  freeObjects();
+}
 
 static Value peek(int depth) {
   return vm.stackTop[-1 - depth];
@@ -33,6 +41,19 @@ static Value peek(int depth) {
 
 static bool isFalsey(Value value) {
   return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+static void concatenate() {
+  ObjString *bStr = AS_STRING(pop());
+  ObjString *aStr = AS_STRING(pop());
+
+  int length = aStr->length + bStr->length;
+  char *chars = ALLOCATE(char, length + 1);
+  memcpy(chars, aStr->chars, aStr->length);
+  memcpy(chars + aStr->length, bStr->chars, bStr->length);
+  chars[length] = '\0';
+  ObjString *result = takeString(chars, length);
+  push(OBJ_VAL(result));
 }
 
 static InterpretResult run() {
@@ -90,9 +111,19 @@ static InterpretResult run() {
     case OP_NOT:
       push(BOOL_VAL(isFalsey(pop())));
       break;
-    case OP_ADD:
-      BINARY_OP(NUMBER_VAL, +);
+    case OP_ADD: {
+      if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
+        concatenate();
+      } else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))) {
+        double b = AS_NUMBER(pop());
+        double a = AS_NUMBER(pop());
+        push(NUMBER_VAL(a + b));
+      } else {
+        runtimeError("Operands must be two numbers or two strings.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       break;
+    }
     case OP_SUBTRACT:
       BINARY_OP(NUMBER_VAL, -);
       break;
