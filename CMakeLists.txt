@@ -10,6 +10,7 @@ add_library(libclox
   src/scanner.c
   src/compiler.c
   src/object.c
+  src/table.c
   src/vm.c)
 
 add_executable(clox src/main.c)
