@@ -53,6 +53,13 @@ static Chunk *currentChunk() {
   return compilingChunk;
 }
 
+static void expression();
+static void statement();
+static void declaration();
+static ParseRule *getRule(TokenType);
+static void parsePrecedence(Precedence);
+static void printStatement();
+
 static void errorAt(Token *token, const char *message) {
   if (parser.panicMode) {
     return;
@@ -101,6 +108,18 @@ static void consume(TokenType type, const char *message) {
   errorAtCurrent(message);
 }
 
+static bool check(TokenType type) {
+  return parser.current.type == type;
+}
+
+static bool match(TokenType type) {
+  if (!check(type)) {
+    return false;
+  }
+  advance();
+  return true;
+}
+
 static void emitByte(uint8_t byte) {
   writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -135,10 +154,6 @@ static void endCompiler() {
   }
 #endif
 }
-
-static void expression();
-static ParseRule *getRule(TokenType);
-static void parsePrecedence(Precedence);
 
 static void binary() {
   TokenType operatorType = parser.previous.type;
@@ -178,6 +193,16 @@ static void binary() {
       break;
     default:
       return;
+  }
+}
+
+static void declaration() {
+  statement();
+}
+
+static void statement() {
+  if (match(TOKEN_PRINT)) {
+    printStatement();
   }
 }
 
@@ -296,15 +321,22 @@ static void expression() {
   parsePrecedence(PREC_ASSIGNMENT);
 }
 
+static void printStatement() {
+  expression();
+  consume(TOKEN_SEMICOLON, "Expect ; after value.");
+  emitByte(OP_PRINT);
+}
+
 bool compile(const char *source, Chunk *chunk) {
   initScanner(source);
   initParser();
-
   compilingChunk = chunk;
-
   advance();
-  expression();
-  consume(TOKEN_EOF, "Expected end of expression.");
+
+  while (!match(TOKEN_EOF)) {
+    declaration();
+  }
+
   endCompiler();
   return !parser.hadError;
 }
