@@ -420,7 +420,7 @@ static void forStatement() {
     emitByte(OP_POP);
   }
 
-  if (!match(TOKEN_SEMICOLON)) {
+  if (!match(TOKEN_RIGHT_PAREN)) {
     int bodyJump = emitJump(OP_JUMP);
     int incrementStart = currentChunk()->count;
     expression();
@@ -434,13 +434,13 @@ static void forStatement() {
   }
 
   statement(); // loop body
-
+  emitLoop(loopStart);
+  
   if (exitJump != -1) {
     patchJump(exitJump);
     emitByte(OP_POP);
   }
-
-  emitLoop(loopStart);
+  
   endScope();
 }
 
