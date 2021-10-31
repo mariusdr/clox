@@ -3,17 +3,47 @@
 
 #include "common.h"
 #include "value.h"
+#include "chunk.h"
 
 typedef enum {
+  OBJ_FUNCTION,
+  OBJ_NATIVE,
   OBJ_STRING,
 } ObjType;
 
 #define OBJ_TYPE(object) (AS_OBJ(object)->type)
 
+#define IS_FUNCTION(value) isObjType(value, OBJ_FUNCTION)
+#define IS_NATIVE(value) isObjType(value, OBJ_NATIVE)
+#define IS_STRING(value) isObjType((value), OBJ_STRING)
+
+#define AS_FUNCTION(value) ((ObjFunction *)AS_OBJ(value))
+#define AS_NATIVE(value) (((ObjNative*)AS_OBJ(value))->function)
+#define AS_STRING(value) ((ObjString *)AS_OBJ((value)))
+#define AS_CSTRING(value) (((ObjString *)AS_OBJ((value)))->chars)
+
 struct Obj {
   ObjType type;
   Obj *next;
 };
+
+typedef struct {
+  Obj obj;
+  int arity;
+  Chunk chunk;
+  ObjString *name;
+} ObjFunction;
+
+ObjFunction *newFunction();
+
+typedef Value (*NativeFn) (int argCount, Value *args);
+
+typedef struct {
+  Obj obj;
+  NativeFn function;
+} ObjNative;
+
+ObjNative *newNative(NativeFn function);
 
 struct ObjString {
   Obj obj;
@@ -28,10 +58,5 @@ ObjString *copyString(const char *chars, int length);
 static inline bool isObjType(Value value, ObjType type) {
   return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
-
-#define IS_STRING(value) isObjType((value), OBJ_STRING)
-
-#define AS_STRING(value) ((ObjString *)AS_OBJ((value)))
-#define AS_CSTRING(value) (((ObjString *)AS_OBJ((value)))->chars)
 
 #endif

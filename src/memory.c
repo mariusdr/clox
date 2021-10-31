@@ -21,11 +21,22 @@ void *reallocate(void *ptr, size_t oldSize, size_t newSize) {
 
 static void freeObject(Obj *object) {
   switch (object->type) {
-    case OBJ_STRING:
+    case OBJ_FUNCTION: {
+      ObjFunction *function = (ObjFunction *)object;
+      freeChunk(&function->chunk);
+      FREE(ObjFunction, object);
+      break;
+    }
+    case OBJ_NATIVE: {
+      FREE(ObjNative, object);
+      break;
+    }
+    case OBJ_STRING: {
       ObjString *str = (ObjString *)object;
       FREE_ARRAY(char, str->chars, str->length + 1);
       FREE(ObjString, object);
       break;
+    }
   }
 }
 

@@ -1,3 +1,22 @@
-for (var i = 0; i < 128; i = i + 1) {
-	print i;
+
+fun assert(value, target) {
+	if (value != target) {
+		print "assertion failed:";
+		print "... expected: ";
+		print target;
+		print "... got: ";
+		print value;	
+
+		return false;
+	}
+	return true;
 }
+
+fun verify1() {
+	var a = 24;
+	var b = 48;
+	assert(a + b, 72);
+}
+
+
+verify1();

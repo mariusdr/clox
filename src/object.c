@@ -61,3 +61,17 @@ static ObjString *allocateString(char* chars, int length, uint32_t hash) {
   tableSet(&vm.strings, str, NIL_VAL);
   return str;
 }
+
+ObjFunction *newFunction() {
+  ObjFunction *function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
+  function->arity = 0;
+  function->name = NULL;
+  initChunk(&function->chunk);
+  return function;
+}
+
+ObjNative *newNative(NativeFn function) {
+  ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+  native->function = function;
+  return native;
+}
