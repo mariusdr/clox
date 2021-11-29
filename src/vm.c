@@ -9,6 +9,7 @@
 #include "vm.h"
 #include "object.h"
 #include "memory.h"
+#include "value.h"
 
 VM vm;
 
@@ -177,10 +178,11 @@ static InterpretResult run() {
       }
       push(NUMBER_VAL(-AS_NUMBER(pop())));
       break;
-    case OP_CONSTANT:
+    case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
       push(constant);
       break;
+    }
     case OP_NIL:
       push(NIL_VAL);
       break;
