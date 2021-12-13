@@ -47,6 +47,12 @@ void printObject(Value value) {
     case OBJ_NATIVE:
       printf("<native fn>");
       break;
+    case OBJ_CLOSURE:
+      printFunction(AS_CLOSURE(value)->function);
+      break;
+    case OBJ_UPVALUE: 
+      printf("upvalue");
+      break;
   }
 }
 
