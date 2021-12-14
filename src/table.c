@@ -28,7 +28,7 @@ static Entry *findEntry(Entry *entries, int capacity, ObjString *key) {
 
   for (;;) {
     Entry *entry = &entries[index];
-    if (entry->key == NULL) {
+    if (!entry->key) {
       if (IS_NIL(entry->value)) {
         return tombstone != NULL ? tombstone : entry;
       } else {
@@ -86,7 +86,7 @@ bool tableSet(Table *table, ObjString *key, Value value) {
 void tableAddAll(Table *from, Table *to) {
   for (int i = 0; i < from->capacity; ++i) {
     Entry *entry = &from->entries[i];
-    if (!entry->key) {
+    if (entry->key) {
       tableSet(to, entry->key, entry->value);
     }
   }
@@ -142,5 +142,22 @@ ObjString *tableFindString(Table *table, const char *chars, int length, uint32_t
       }
     }
     index = (index + 1) % table->capacity;
+  }
+}
+
+void markTable(Table *table) {
+  for (int i = 0; i < table->capacity; ++i) {
+    Entry *entry = &table->entries[i];
+    markObject((Obj*)entry->key);
+    markValue(entry->value);
+  }
+}
+
+void tableRemoveWhite(Table *table) {
+  for (int i = 0; i < table->capacity; ++i) {
+    Entry *entry = &table->entries[i];
+    if (entry->key && !entry->key->obj.isMarked) {
+      tableDelete(table, entry->key);
+    }
   }
 }
