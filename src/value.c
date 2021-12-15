@@ -53,6 +53,12 @@ void printObject(Value value) {
     case OBJ_UPVALUE: 
       printf("upvalue");
       break;
+    case OBJ_CLASS:
+      printf("%s", AS_CLASS(value)->name->chars);
+      break;
+    case OBJ_INSTANCE: 
+      printf("%s instance", AS_INSTANCE(value)->klass->name->chars);
+      break;
   }
 }
 

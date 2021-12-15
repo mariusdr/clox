@@ -112,7 +112,6 @@ int disassembleInstruction(Chunk *chunk, int offset) {
       int index = chunk->code[offset++];
       printf("%04d      |                     %s %d\n", offset - 2, isLocal ? "local" : "upvalue", index);
     }
-
     return offset;
   } 
   case OP_GET_UPVALUE: 
@@ -121,6 +120,12 @@ int disassembleInstruction(Chunk *chunk, int offset) {
     return byteInstruction("OP_SET_UPVALUE", chunk, offset);
   case OP_CLOSE_UPVALUE: 
     return byteInstruction("OP_CLOSE_UPVALUE", chunk, offset);
+  case OP_CLASS: 
+    return constantInstruction("OP_CLASS", chunk, offset);
+  case OP_GET_PROPERTY: 
+    return constantInstruction("OP_GET_PROPERTY", chunk, offset);
+  case OP_SET_PROPERTY:
+    return constantInstruction("OP_SET_PROPERTY", chunk, offset);
   default:
     printf("unknown opcode %d\n", inst);
     return offset + 1;

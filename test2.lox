@@ -1,0 +1,14 @@
+
+class Vec2 {}
+
+print Vec2;
+
+var v = Vec2();
+
+print v;
+
+v.x = 12;
+v.y = 34;
+
+print v.x + v.y;
+
