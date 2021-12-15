@@ -23,6 +23,11 @@ typedef struct {
   Value *stackTop;
   Table globals;
   Table strings;
+
+  // This holds the interned string "init" so that calls 
+  // to constructors are as fast as possible.
+  ObjString *initString;
+
   ObjUpvalue *openUpvalues;
 
   size_t bytesAllocated;

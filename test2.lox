@@ -1,14 +1,9 @@
 
-class Vec2 {}
+class Scone {
+	topping(first, second) {
+		print "scone with " + first + " and " + second;
+	}
+}
 
-print Vec2;
-
-var v = Vec2();
-
-print v;
-
-v.x = 12;
-v.y = 34;
-
-print v.x + v.y;
-
+var scone = Scone();
+scone.topping("berries", "cream");
